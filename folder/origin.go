@@ -181,7 +181,7 @@ func (o *OriginImpl) CopyTo(destPath string) error {
 		dstPath := filepath.Join(destPath, file)
 
 		// Create parent directory
-		if err := o.fs.MkdirAll(filepath.Dir(dstPath), 0755); err != nil {
+		if err := o.fs.MkdirAll(filepath.Dir(dstPath), 0o755); err != nil {
 			return fmt.Errorf("failed to create directory for %s: %w", file, err)
 		}
 
@@ -193,7 +193,7 @@ func (o *OriginImpl) CopyTo(destPath string) error {
 
 		// Get source permissions
 		srcInfo, err := o.fs.Stat(srcPath)
-		perm := os.FileMode(0644)
+		perm := os.FileMode(0o644)
 		if err == nil {
 			perm = srcInfo.Mode().Perm()
 		}

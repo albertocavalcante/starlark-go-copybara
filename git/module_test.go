@@ -8,22 +8,22 @@ import (
 
 func TestOriginFn(t *testing.T) {
 	tests := []struct {
-		name           string
-		code           string
-		wantURL        string
-		wantRef        string
-		wantSubmodules SubmoduleStrategy
-		wantFirstParent bool
+		name             string
+		code             string
+		wantURL          string
+		wantRef          string
+		wantSubmodules   SubmoduleStrategy
+		wantFirstParent  bool
 		wantPartialFetch bool
-		wantErr        bool
+		wantErr          bool
 	}{
 		{
-			name:            "minimal",
-			code:            `git.origin(url = "https://github.com/example/repo")`,
-			wantURL:         "https://github.com/example/repo",
-			wantRef:         "master",
-			wantSubmodules:  SubmoduleNo,
-			wantFirstParent: true,
+			name:             "minimal",
+			code:             `git.origin(url = "https://github.com/example/repo")`,
+			wantURL:          "https://github.com/example/repo",
+			wantRef:          "master",
+			wantSubmodules:   SubmoduleNo,
+			wantFirstParent:  true,
 			wantPartialFetch: false,
 		},
 		{
@@ -116,15 +116,15 @@ func TestOriginFn(t *testing.T) {
 
 func TestDestinationFn(t *testing.T) {
 	tests := []struct {
-		name        string
-		code        string
-		wantURL     string
-		wantPush    string
-		wantFetch   string
-		wantTagName string
-		wantTagMsg  string
+		name         string
+		code         string
+		wantURL      string
+		wantPush     string
+		wantFetch    string
+		wantTagName  string
+		wantTagMsg   string
 		wantSkipPush bool
-		wantErr     bool
+		wantErr      bool
 	}{
 		{
 			name:    "minimal",

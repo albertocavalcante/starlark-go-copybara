@@ -104,7 +104,7 @@ func (d *Destination) Integrates() []*IntegrateChanges {
 // Attr implements starlark.HasAttrs.
 func (d *Destination) Attr(name string) (starlark.Value, error) {
 	switch name {
-	case "url":
+	case attrURL:
 		return starlark.String(d.url), nil
 	case "push":
 		return starlark.String(d.push), nil
@@ -116,7 +116,7 @@ func (d *Destination) Attr(name string) (starlark.Value, error) {
 		return starlark.String(d.tagMsg), nil
 	case "skip_push":
 		return starlark.Bool(d.skipPush), nil
-	case "primary_branch_migration":
+	case attrPrimaryBranchMigration:
 		return starlark.Bool(d.primaryBranchMigration), nil
 	default:
 		return nil, nil
@@ -126,12 +126,12 @@ func (d *Destination) Attr(name string) (starlark.Value, error) {
 // AttrNames implements starlark.HasAttrs.
 func (d *Destination) AttrNames() []string {
 	return []string{
-		"url",
+		attrURL,
 		"push",
 		"fetch",
 		"tag_name",
 		"tag_msg",
 		"skip_push",
-		"primary_branch_migration",
+		attrPrimaryBranchMigration,
 	}
 }

@@ -44,12 +44,12 @@ var Module = &starlarkstruct.Module{
 func originFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
 		url                     string
-		ref                     string = "master"
-		submodules              string = "NO"
-		includeBranchCommitLogs bool   = false
-		firstParent             bool   = true
-		partialFetch            bool   = false
-		primaryBranchMigration  bool   = false
+		ref                     = "master"
+		submodules              = "NO"
+		includeBranchCommitLogs = false
+		firstParent             = true
+		partialFetch            = false
+		primaryBranchMigration  = false
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -100,10 +100,10 @@ func destinationFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 		fetch                  string
 		tagName                string
 		tagMsg                 string
-		skipPush               bool = false
+		skipPush               = false
 		branch                 string
 		integratesValue        *starlark.List
-		primaryBranchMigration bool = false
+		primaryBranchMigration = false
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -131,7 +131,7 @@ func destinationFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 	// Parse integrates list
 	var integrates []*IntegrateChanges
 	if integratesValue != nil {
-		for i := 0; i < integratesValue.Len(); i++ {
+		for i := range integratesValue.Len() {
 			item := integratesValue.Index(i)
 			ic, ok := item.(*IntegrateChanges)
 			if !ok {
@@ -170,14 +170,14 @@ func destinationFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 func githubOriginFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
 		url                    string
-		ref                    string = "master"
+		ref                    = "master"
 		branch                 string
-		submodules             string = "NO"
-		firstParent            bool   = true
-		partialFetch           bool   = false
-		state                  string = "OPEN"
-		reviewState            string = "ANY"
-		primaryBranchMigration bool   = false
+		submodules             = "NO"
+		firstParent            = true
+		partialFetch           = false
+		state                  = "OPEN"
+		reviewState            = "ANY"
+		primaryBranchMigration = false
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -244,14 +244,14 @@ func githubOriginFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark
 func githubPrDestinationFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
 		url                    string
-		destinationRef         string = "main"
+		destinationRef         = "main"
 		prBranch               string
 		title                  string
 		body                   string
-		draft                  bool = false
+		draft                  = false
 		integratesValue        *starlark.List
-		primaryBranchMigration bool = false
-		updateDescription      bool = true
+		primaryBranchMigration = false
+		updateDescription      = true
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -271,7 +271,7 @@ func githubPrDestinationFn(thread *starlark.Thread, fn *starlark.Builtin, args s
 	// Parse integrates list
 	var integrates []*IntegrateChanges
 	if integratesValue != nil {
-		for i := 0; i < integratesValue.Len(); i++ {
+		for i := range integratesValue.Len() {
 			item := integratesValue.Index(i)
 			ic, ok := item.(*IntegrateChanges)
 			if !ok {
@@ -299,17 +299,17 @@ func githubPrDestinationFn(thread *starlark.Thread, fn *starlark.Builtin, args s
 // Parameters:
 //   - label (optional): The label containing the URL to integrate (default: "COPYBARA_INTEGRATE_REVIEW")
 //   - strategy (optional): Integration strategy (default: "FAKE_MERGE_AND_INCLUDE_FILES")
-//     - "FAKE_MERGE": Add as parent but ignore files
-//     - "FAKE_MERGE_AND_INCLUDE_FILES": Fake merge but include non-destination files
-//     - "INCLUDE_FILES": Include non-destination files without merge commit
+//   - "FAKE_MERGE": Add as parent but ignore files
+//   - "FAKE_MERGE_AND_INCLUDE_FILES": Fake merge but include non-destination files
+//   - "INCLUDE_FILES": Include non-destination files without merge commit
 //   - ignore_errors (optional): Ignore integration errors (default: true)
 //
 // Reference: GitIntegrateChanges.java
 func integrateFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
-		label        string = DefaultIntegrateLabel
-		strategy     string = "FAKE_MERGE_AND_INCLUDE_FILES"
-		ignoreErrors bool   = true
+		label        = DefaultIntegrateLabel
+		strategy     = "FAKE_MERGE_AND_INCLUDE_FILES"
+		ignoreErrors = true
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,

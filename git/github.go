@@ -67,15 +67,15 @@ func ParseStateFilter(s string) (StateFilter, error) {
 //
 // Reference: https://github.com/google/copybara/blob/master/java/com/google/copybara/git/GitHubPrOrigin.java
 type GitHubOrigin struct {
-	url                     string
-	ref                     string
-	branch                  string
-	submodules              SubmoduleStrategy
-	firstParent             bool
-	partialFetch            bool
-	state                   StateFilter
-	reviewState             ReviewState
-	primaryBranchMigration  bool
+	url                    string
+	ref                    string
+	branch                 string
+	submodules             SubmoduleStrategy
+	firstParent            bool
+	partialFetch           bool
+	state                  StateFilter
+	reviewState            ReviewState
+	primaryBranchMigration bool
 }
 
 // String implements starlark.Value.

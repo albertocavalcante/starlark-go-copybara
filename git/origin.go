@@ -38,13 +38,13 @@ func ParseSubmoduleStrategy(s string) (SubmoduleStrategy, error) {
 //
 // Reference: https://github.com/google/copybara/blob/master/java/com/google/copybara/git/GitOrigin.java
 type Origin struct {
-	url                      string
-	ref                      string
-	submodules               SubmoduleStrategy
-	includeBranchCommitLogs  bool
-	firstParent              bool
-	partialFetch             bool
-	primaryBranchMigration   bool
+	url                     string
+	ref                     string
+	submodules              SubmoduleStrategy
+	includeBranchCommitLogs bool
+	firstParent             bool
+	partialFetch            bool
+	primaryBranchMigration  bool
 }
 
 // String implements starlark.Value.
@@ -122,12 +122,19 @@ func (o *Origin) PrimaryBranchMigration() bool {
 	return o.primaryBranchMigration
 }
 
+// Attribute names for git.origin.
+const (
+	attrURL                    = "url"
+	attrRef                    = "ref"
+	attrPrimaryBranchMigration = "primary_branch_migration"
+)
+
 // Attr implements starlark.HasAttrs.
 func (o *Origin) Attr(name string) (starlark.Value, error) {
 	switch name {
-	case "url":
+	case attrURL:
 		return starlark.String(o.url), nil
-	case "ref":
+	case attrRef:
 		return starlark.String(o.ref), nil
 	case "submodules":
 		return starlark.String(o.submodules), nil
@@ -137,7 +144,7 @@ func (o *Origin) Attr(name string) (starlark.Value, error) {
 		return starlark.Bool(o.firstParent), nil
 	case "partial_fetch":
 		return starlark.Bool(o.partialFetch), nil
-	case "primary_branch_migration":
+	case attrPrimaryBranchMigration:
 		return starlark.Bool(o.primaryBranchMigration), nil
 	default:
 		return nil, nil
@@ -147,12 +154,12 @@ func (o *Origin) Attr(name string) (starlark.Value, error) {
 // AttrNames implements starlark.HasAttrs.
 func (o *Origin) AttrNames() []string {
 	return []string{
-		"url",
-		"ref",
+		attrURL,
+		attrRef,
 		"submodules",
 		"include_branch_commit_logs",
 		"first_parent",
 		"partial_fetch",
-		"primary_branch_migration",
+		attrPrimaryBranchMigration,
 	}
 }

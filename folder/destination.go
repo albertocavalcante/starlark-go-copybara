@@ -64,7 +64,7 @@ func (d *DestinationImpl) Write(changes []*vcs.Change) error {
 	path := d.path()
 
 	// Ensure destination directory exists
-	if err := d.fs.MkdirAll(path, 0755); err != nil {
+	if err := d.fs.MkdirAll(path, 0o755); err != nil {
 		return fmt.Errorf("failed to create destination directory %s: %w", path, err)
 	}
 
@@ -80,7 +80,7 @@ func (d *DestinationImpl) WriteFile(relativePath string, data []byte, perm os.Fi
 
 	// Create parent directories
 	dir := filepath.Dir(fullPath)
-	if err := d.fs.MkdirAll(dir, 0755); err != nil {
+	if err := d.fs.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", dir, err)
 	}
 
@@ -95,7 +95,7 @@ func (d *DestinationImpl) WriteFile(relativePath string, data []byte, perm os.Fi
 // WriteFiles writes multiple files to the destination.
 func (d *DestinationImpl) WriteFiles(files map[string][]byte) error {
 	for path, data := range files {
-		if err := d.WriteFile(path, data, 0644); err != nil {
+		if err := d.WriteFile(path, data, 0o644); err != nil {
 			return err
 		}
 	}
@@ -114,7 +114,7 @@ func (d *DestinationImpl) CopyFrom(srcPath string) error {
 		dst := filepath.Join(d.path(), file)
 
 		// Create parent directory
-		if err := d.fs.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+		if err := d.fs.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 			return fmt.Errorf("failed to create directory for %s: %w", file, err)
 		}
 
@@ -126,7 +126,7 @@ func (d *DestinationImpl) CopyFrom(srcPath string) error {
 
 		// Get source permissions
 		srcInfo, err := d.fs.Stat(src)
-		perm := os.FileMode(0644)
+		perm := os.FileMode(0o644)
 		if err == nil {
 			perm = srcInfo.Mode().Perm()
 		}
@@ -192,7 +192,7 @@ func (d *DestinationImpl) EnsureCleanDestination() error {
 
 	// Create if doesn't exist
 	if !d.fs.Exists(path) {
-		return d.fs.MkdirAll(path, 0755)
+		return d.fs.MkdirAll(path, 0o755)
 	}
 
 	// Clear if exists

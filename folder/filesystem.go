@@ -57,7 +57,7 @@ func NewOSFileSystem() *OSFileSystem {
 
 // ReadFile reads the entire contents of a file.
 func (f *OSFileSystem) ReadFile(path string) ([]byte, error) {
-	return os.ReadFile(path)
+	return os.ReadFile(path) //nolint:gosec // path comes from trusted callers
 }
 
 // WriteFile writes data to a file, creating it if necessary.
@@ -183,7 +183,7 @@ func (f *MemoryFileSystem) WriteFile(path string, data []byte, perm fs.FileMode)
 	// Create parent directories
 	dir := filepath.Dir(path)
 	if dir != "." && dir != "/" {
-		f.mkdirAllLocked(dir, 0755)
+		_ = f.mkdirAllLocked(dir, 0o755)
 	}
 
 	// Copy data to prevent mutation
@@ -215,7 +215,7 @@ func (f *MemoryFileSystem) ListFiles(dir string) ([]string, error) {
 			continue
 		}
 		// Only include files within the directory (not starting with ..)
-		if len(rel) > 0 && rel[0] != '.' {
+		if rel != "" && rel[0] != '.' {
 			files = append(files, rel)
 		} else if rel == filepath.Base(path) && filepath.Dir(path) == dir {
 			files = append(files, rel)
@@ -370,7 +370,7 @@ func CopyFile(fsys FileSystem, src, dst string) error {
 	}
 
 	// Get source permissions if possible
-	perm := os.FileMode(0644)
+	perm := os.FileMode(0o644)
 	if info, err := fsys.Stat(src); err == nil {
 		perm = info.Mode().Perm()
 	}
@@ -390,7 +390,7 @@ func CopyDir(fsys FileSystem, src, dst string) error {
 		dstPath := filepath.Join(dst, file)
 
 		// Create parent directory
-		if err := fsys.MkdirAll(filepath.Dir(dstPath), 0755); err != nil {
+		if err := fsys.MkdirAll(filepath.Dir(dstPath), 0o755); err != nil {
 			return err
 		}
 

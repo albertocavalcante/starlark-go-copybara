@@ -41,19 +41,19 @@ var Module = &starlarkstruct.Module{
 // Reference: MetadataModule.java squashNotes()
 func squashNotesFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
-		prefix          string = "Copybara import of the project:\n\n"
-		max             int    = 100
-		compact         bool   = true
-		showRef         bool   = true
-		showAuthor      bool   = true
-		showDescription bool   = true
-		oldestFirst     bool   = false
-		useMerge        bool   = true
+		prefix          = "Copybara import of the project:\n\n"
+		maxNotes        = 100
+		compact         = true
+		showRef         = true
+		showAuthor      = true
+		showDescription = true
+		oldestFirst     = false
+		useMerge        = true
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
 		"prefix?", &prefix,
-		"max?", &max,
+		"max?", &maxNotes,
 		"compact?", &compact,
 		"show_ref?", &showRef,
 		"show_author?", &showAuthor,
@@ -70,7 +70,7 @@ func squashNotesFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 
 	return &SquashNotes{
 		prefix:          prefix,
-		max:             max,
+		max:             maxNotes,
 		compact:         compact,
 		showRef:         showRef,
 		showAuthor:      showAuthor,
@@ -85,8 +85,8 @@ func squashNotesFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 // Reference: MetadataModule.java saveAuthor()
 func saveAuthorFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
-		label     string = "ORIGINAL_AUTHOR"
-		separator string = "="
+		label     = "ORIGINAL_AUTHOR"
+		separator = "="
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -107,9 +107,9 @@ func saveAuthorFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.T
 // Reference: MetadataModule.java restoreAuthor()
 func restoreAuthorFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
-		label            string = "ORIGINAL_AUTHOR"
-		separator        string = "="
-		searchAllChanges bool   = false
+		label            = "ORIGINAL_AUTHOR"
+		separator        = "="
+		searchAllChanges = false
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -133,7 +133,7 @@ func restoreAuthorFn(thread *starlark.Thread, fn *starlark.Builtin, args starlar
 func replaceMessageFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
 		text                string
-		ignoreLabelNotFound bool = false
+		ignoreLabelNotFound = false
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -156,9 +156,9 @@ func exposeLabelFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 	var (
 		name                string
 		newName             starlark.Value = starlark.None
-		separator           string         = "="
-		ignoreLabelNotFound bool           = true
-		all                 bool           = false
+		separator                          = "="
+		ignoreLabelNotFound                = true
+		all                                = false
 		concatSeparator     starlark.Value = starlark.None
 	)
 
@@ -223,8 +223,8 @@ func exposeLabelFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 func addHeaderFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
 		text                string
-		ignoreLabelNotFound bool = false
-		newLine             bool = true
+		ignoreLabelNotFound = false
+		newLine             = true
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -250,8 +250,8 @@ func scrubberFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tup
 		regex         string
 		regexes       *starlark.List
 		msgIfNoMatch  starlark.Value = starlark.None
-		failIfNoMatch bool           = false
-		replacement   string         = ""
+		failIfNoMatch                = false
+		replacement                  = ""
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,
@@ -276,7 +276,7 @@ func scrubberFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tup
 	}
 
 	if regexes != nil {
-		for i := 0; i < regexes.Len(); i++ {
+		for i := range regexes.Len() {
 			item := regexes.Index(i)
 			s, ok := starlark.AsString(item)
 			if !ok {
@@ -323,11 +323,11 @@ func scrubberFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tup
 func mapAuthorFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var (
 		authors               *starlark.Dict
-		reversible            bool = false
-		noopReverse           bool = false
-		failIfNotFound        bool = false
-		reverseFailIfNotFound bool = false
-		mapAllChanges         bool = false
+		reversible            = false
+		noopReverse           = false
+		failIfNotFound        = false
+		reverseFailIfNotFound = false
+		mapAllChanges         = false
 	)
 
 	if err := starlark.UnpackArgs(fn.Name(), args, kwargs,

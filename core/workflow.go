@@ -159,7 +159,7 @@ func workflowFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tup
 		transformations  *starlark.List
 		originFiles      starlark.Value = starlark.None
 		destinationFiles starlark.Value = starlark.None
-		mode             string         = "SQUASH"
+		mode                            = "SQUASH"
 		reversibleCheck  starlark.Value = starlark.None
 	)
 

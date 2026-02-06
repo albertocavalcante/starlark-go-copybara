@@ -101,7 +101,7 @@ func (m *Move) moveDir(src, dst string) error {
 		dstPath := filepath.Join(dst, relPath)
 
 		if d.IsDir() {
-			return os.MkdirAll(dstPath, 0o755)
+			return os.MkdirAll(dstPath, 0o750)
 		}
 
 		// Move file
@@ -130,7 +130,7 @@ func (m *Move) moveFile(src, dst string) error {
 	}
 
 	// Ensure parent directory exists
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dst), 0o750); err != nil {
 		return fmt.Errorf("failed to create parent directory: %w", err)
 	}
 
@@ -150,33 +150,35 @@ func (m *Move) moveFile(src, dst string) error {
 // copyAndDelete copies a file and deletes the source.
 func (m *Move) copyAndDelete(src, dst string) error {
 	// Open source file
-	srcFile, err := os.Open(src)
+	srcFile, err := os.Open(src) //nolint:gosec // src is validated by caller
 	if err != nil {
 		return fmt.Errorf("failed to open source file: %w", err)
 	}
-	defer srcFile.Close()
 
 	// Get source file info for permissions
 	srcInfo, err := srcFile.Stat()
 	if err != nil {
+		_ = srcFile.Close()
 		return fmt.Errorf("failed to stat source file: %w", err)
 	}
 
 	// Create destination file
-	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, srcInfo.Mode())
+	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, srcInfo.Mode()) //nolint:gosec // dst is validated by caller
 	if err != nil {
+		_ = srcFile.Close()
 		return fmt.Errorf("failed to create destination file: %w", err)
 	}
-	defer dstFile.Close()
 
 	// Copy content
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
+		_ = srcFile.Close()
+		_ = dstFile.Close()
 		return fmt.Errorf("failed to copy file content: %w", err)
 	}
 
 	// Close files before deleting
-	srcFile.Close()
-	dstFile.Close()
+	_ = srcFile.Close()
+	_ = dstFile.Close()
 
 	// Delete source
 	if err := os.Remove(src); err != nil {

@@ -100,7 +100,7 @@ func (c *Copy) copyDir(src, dst string) error {
 		dstPath := filepath.Join(dst, relPath)
 
 		if d.IsDir() {
-			return os.MkdirAll(dstPath, 0o755)
+			return os.MkdirAll(dstPath, 0o750)
 		}
 
 		return c.copyFile(path, dstPath)
@@ -117,16 +117,16 @@ func (c *Copy) copyFile(src, dst string) error {
 	}
 
 	// Ensure parent directory exists
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dst), 0o750); err != nil {
 		return fmt.Errorf("failed to create parent directory: %w", err)
 	}
 
 	// Open source file
-	srcFile, err := os.Open(src)
+	srcFile, err := os.Open(src) //nolint:gosec // src is validated by caller
 	if err != nil {
 		return fmt.Errorf("failed to open source file: %w", err)
 	}
-	defer srcFile.Close()
+	defer func() { _ = srcFile.Close() }()
 
 	// Get source file info for permissions
 	srcInfo, err := srcFile.Stat()
@@ -135,11 +135,11 @@ func (c *Copy) copyFile(src, dst string) error {
 	}
 
 	// Create destination file
-	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, srcInfo.Mode())
+	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, srcInfo.Mode()) //nolint:gosec // dst is validated by caller
 	if err != nil {
 		return fmt.Errorf("failed to create destination file: %w", err)
 	}
-	defer dstFile.Close()
+	defer func() { _ = dstFile.Close() }()
 
 	// Copy content
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
@@ -203,7 +203,7 @@ func copyFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, 
 		return nil, fmt.Errorf("copying from the same folder to the same folder is a noop")
 	}
 
-	copy := &Copy{
+	cp := &Copy{
 		before:    before,
 		after:     after,
 		overwrite: overwrite,
@@ -212,9 +212,9 @@ func copyFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, 
 	// Handle paths parameter
 	switch v := paths.(type) {
 	case starlark.NoneType:
-		copy.paths = AllFiles()
+		cp.paths = AllFiles()
 	case *Glob:
-		copy.paths = v
+		cp.paths = v
 	case *starlark.List:
 		patterns := make([]string, v.Len())
 		for i := range v.Len() {
@@ -225,7 +225,7 @@ func copyFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, 
 			patterns[i] = s
 		}
 		var err error
-		copy.paths, err = NewGlob(patterns, nil)
+		cp.paths, err = NewGlob(patterns, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -233,5 +233,5 @@ func copyFn(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, 
 		return nil, fmt.Errorf("paths must be a glob or list of strings, got %s", paths.Type())
 	}
 
-	return copy, nil
+	return cp, nil
 }

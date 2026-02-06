@@ -85,7 +85,7 @@ func (r *Replace) Apply(ctx *transform.Context) error {
 		}
 
 		// Read file content
-		content, err := os.ReadFile(path)
+		content, err := os.ReadFile(path) //nolint:gosec // path is from WalkDir in workdir
 		if err != nil {
 			return fmt.Errorf("failed to read file %q: %w", relPath, err)
 		}

@@ -6,6 +6,12 @@ import (
 	"go.starlark.net/starlark"
 )
 
+// Attribute names for origin_ref.
+const (
+	attrRef = "ref"
+	attrURL = "url"
+)
+
 // Ensure OriginRef implements required interfaces.
 var (
 	_ starlark.Value    = (*OriginRef)(nil)
@@ -64,9 +70,9 @@ func (o *OriginRef) URL() string {
 // Attr implements starlark.HasAttrs.
 func (o *OriginRef) Attr(name string) (starlark.Value, error) {
 	switch name {
-	case "ref":
+	case attrRef:
 		return starlark.String(o.ref), nil
-	case "url":
+	case attrURL:
 		return starlark.String(o.url), nil
 	default:
 		return nil, nil
@@ -75,5 +81,5 @@ func (o *OriginRef) Attr(name string) (starlark.Value, error) {
 
 // AttrNames implements starlark.HasAttrs.
 func (o *OriginRef) AttrNames() []string {
-	return []string{"ref", "url"}
+	return []string{attrRef, attrURL}
 }

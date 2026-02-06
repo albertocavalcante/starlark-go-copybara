@@ -9,6 +9,11 @@ import (
 	"go.starlark.net/starlark"
 )
 
+// Attribute names for path.
+const (
+	attrPath = "path"
+)
+
 // Ensure Path implements required interfaces.
 var (
 	_ starlark.Value    = (*Path)(nil)
@@ -34,7 +39,7 @@ func (p *Path) String() string {
 
 // Type implements starlark.Value.
 func (p *Path) Type() string {
-	return "path"
+	return attrPath
 }
 
 // Freeze implements starlark.Value.
@@ -102,7 +107,7 @@ func (p *Path) Relativize(other *Path) (*Path, error) {
 // Attr implements starlark.HasAttrs.
 func (p *Path) Attr(name string) (starlark.Value, error) {
 	switch name {
-	case "path":
+	case attrPath:
 		return starlark.String(p.path), nil
 	case "name":
 		return starlark.String(p.Base()), nil

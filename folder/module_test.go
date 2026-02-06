@@ -393,12 +393,11 @@ func TestOriginCopyTo(t *testing.T) {
 	}
 
 	// Create origin and copy
-	origin := &folder.Origin{}
 	// Use the module to create it properly
 	thread := &starlark.Thread{Name: "test"}
 	predeclared := starlark.StringDict{"folder": folder.Module}
 	val, _ := starlark.Eval(thread, "test.sky", `folder.origin(path = "`+srcDir+`")`, predeclared)
-	origin = val.(*folder.Origin)
+	origin := val.(*folder.Origin)
 
 	impl := origin.Impl()
 	if err := impl.CopyTo(dstDir); err != nil {
@@ -559,11 +558,10 @@ func TestMemoryFileSystem(t *testing.T) {
 
 func TestOriginWithMemoryFileSystem(t *testing.T) {
 	// Create an origin with memory filesystem for WASM compatibility testing
-	origin := &folder.Origin{}
 	thread := &starlark.Thread{Name: "test"}
 	predeclared := starlark.StringDict{"folder": folder.Module}
 	val, _ := starlark.Eval(thread, "test.sky", `folder.origin(path = "/virtual")`, predeclared)
-	origin = val.(*folder.Origin)
+	origin := val.(*folder.Origin)
 
 	memFS := folder.NewMemoryFileSystem()
 	memFS.WriteFile("/virtual/test.txt", []byte("virtual content"), 0644)

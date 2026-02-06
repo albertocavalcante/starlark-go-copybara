@@ -313,14 +313,11 @@ func matchDoubleStarPattern(pattern, path string) bool {
 			return true // ** matches everything
 		}
 
-		suffix := parts[1]
-		if strings.HasPrefix(suffix, "/") {
-			suffix = suffix[1:]
-		}
+		suffix := strings.TrimPrefix(parts[1], "/")
 
 		// Try matching suffix against path and all subdirectories
 		pathParts := strings.Split(path, "/")
-		for i := range len(pathParts) {
+		for i := range pathParts {
 			subPath := strings.Join(pathParts[i:], "/")
 			if matchGlobPattern(suffix, subPath) {
 				return true
@@ -350,7 +347,7 @@ func matchDoubleStarPattern(pattern, path string) bool {
 
 	// Try matching suffix against remaining path and all subdirectories
 	remainingParts := strings.Split(remaining, "/")
-	for i := range len(remainingParts) {
+	for i := range remainingParts {
 		subPath := strings.Join(remainingParts[i:], "/")
 		if matchGlobPattern(suffix, subPath) {
 			return true

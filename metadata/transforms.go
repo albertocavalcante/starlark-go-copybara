@@ -202,10 +202,12 @@ type RestoreAuthor struct {
 func (r *RestoreAuthor) String() string {
 	return fmt.Sprintf("metadata.restore_author(label = %q)", r.label)
 }
-func (r *RestoreAuthor) Type() string          { return "restore_author" }
-func (r *RestoreAuthor) Freeze()               {}
-func (r *RestoreAuthor) Truth() starlark.Bool  { return starlark.True }
-func (r *RestoreAuthor) Hash() (uint32, error) { return 0, fmt.Errorf("unhashable type: restore_author") }
+func (r *RestoreAuthor) Type() string         { return "restore_author" }
+func (r *RestoreAuthor) Freeze()              {}
+func (r *RestoreAuthor) Truth() starlark.Bool { return starlark.True }
+func (r *RestoreAuthor) Hash() (uint32, error) {
+	return 0, fmt.Errorf("unhashable type: restore_author")
+}
 
 // Apply implements Transformation.
 func (r *RestoreAuthor) Apply(ctx *transform.Context) error {
@@ -264,10 +266,12 @@ type ReplaceMessage struct {
 func (r *ReplaceMessage) String() string {
 	return fmt.Sprintf("metadata.replace_message(%q)", r.message)
 }
-func (r *ReplaceMessage) Type() string          { return "replace_message" }
-func (r *ReplaceMessage) Freeze()               {}
-func (r *ReplaceMessage) Truth() starlark.Bool  { return starlark.True }
-func (r *ReplaceMessage) Hash() (uint32, error) { return 0, fmt.Errorf("unhashable type: replace_message") }
+func (r *ReplaceMessage) Type() string         { return "replace_message" }
+func (r *ReplaceMessage) Freeze()              {}
+func (r *ReplaceMessage) Truth() starlark.Bool { return starlark.True }
+func (r *ReplaceMessage) Hash() (uint32, error) {
+	return 0, fmt.Errorf("unhashable type: replace_message")
+}
 
 // Apply implements Transformation.
 func (r *ReplaceMessage) Apply(ctx *transform.Context) error {
@@ -295,13 +299,13 @@ func (r *ReplaceMessage) Describe() string {
 //
 // Reference: https://github.com/google/copybara/blob/master/java/com/google/copybara/transform/metadata/ExposeLabelInMessage.java
 type ExposeLabel struct {
-	name                  string
-	newName               string
-	separator             string
-	ignoreLabelNotFound   bool
-	all                   bool
-	concatSeparator       string
-	hasConcatSeparator    bool
+	name                string
+	newName             string
+	separator           string
+	ignoreLabelNotFound bool
+	all                 bool
+	concatSeparator     string
+	hasConcatSeparator  bool
 }
 
 func (e *ExposeLabel) String() string {
@@ -485,11 +489,11 @@ type MapAuthor struct {
 	// nameToAuthor maps name only to Author
 	nameToAuthor map[string]*authoring.Author
 
-	reversible              bool
-	noopReverse             bool
-	failIfNotFound          bool
-	reverseFailIfNotFound   bool
-	mapAll                  bool
+	reversible            bool
+	noopReverse           bool
+	failIfNotFound        bool
+	reverseFailIfNotFound bool
+	mapAll                bool
 }
 
 func (m *MapAuthor) String() string        { return "metadata.map_author()" }
