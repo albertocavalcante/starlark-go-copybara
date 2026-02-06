@@ -4,28 +4,12 @@
 
 A clean-room Go implementation of Copybara's Starlark dialect.
 
-## Overview
+## Features
 
-This project implements Copybara's Starlark dialect in Go, enabling:
-
-- Parsing and evaluation of `copy.bara.sky` files
-- Execution of code transformation workflows
+- Parse and evaluate `copy.bara.sky` configuration files
+- Execute code transformation workflows
 - WASM compilation for browser-based tools
 - Dry-run simulation for testing workflows
-
-## Status
-
-**Work in progress** - This project is in early development.
-
-## Modules
-
-| Module | Description |
-|--------|-------------|
-| `core` | Core transformations (move, replace, workflow) |
-| `git` | Git origins and destinations |
-| `metadata` | Commit message transformations |
-| `authoring` | Author handling |
-| `folder` | Local folder origins/destinations for testing |
 
 ## Installation
 
@@ -51,8 +35,14 @@ core.workflow(
     name = "default",
     origin = folder.origin(),
     destination = folder.destination(),
+    authoring = authoring.pass_thru("Default Author <author@example.com>"),
     transformations = [
         core.move("src", "lib"),
+        core.replace(
+            before = "old_name",
+            after = "new_name",
+        ),
+        metadata.squash_notes(),
     ],
 )
 `
@@ -62,42 +52,29 @@ core.workflow(
         panic(err)
     }
 
-    fmt.Printf("Workflows: %v\n", result.Workflows())
+    for _, wf := range result.Workflows() {
+        fmt.Printf("Workflow: %s\n", wf.Name())
+    }
 }
 ```
 
-## Building
+## Modules
 
-```bash
-# Build library
-go build ./...
+| Module | Description |
+|--------|-------------|
+| `core` | Workflows and transformations (move, copy, replace, remove, verify_match) |
+| `git` | Git origins and destinations (including GitHub) |
+| `metadata` | Commit message transformations |
+| `authoring` | Author handling modes |
+| `folder` | Local folder origins/destinations for testing |
 
-# Build WASM
-GOOS=js GOARCH=wasm go build -o main.wasm ./wasm/
+## Status
 
-# Run tests
-just test
-```
+**Work in progress** - Core modules are implemented. See [CONTRIBUTING.md](CONTRIBUTING.md) for development status.
 
-## Development
+## Contributing
 
-This project uses:
-- [just](https://just.systems/) for task running
-- [golangci-lint](https://golangci-lint.run/) v2 for linting
-- [lefthook](https://github.com/evilmartians/lefthook) for git hooks
-- [gotestsum](https://github.com/gotestyourself/gotestsum) for test output
-
-```bash
-# Install tools
-go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
-go install github.com/evilmartians/lefthook@latest
-
-# Set up hooks
-lefthook install
-
-# Run development workflow
-just dev
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions, development workflow, and guidelines.
 
 ## Reference
 
@@ -108,7 +85,5 @@ This is a clean-room implementation based on:
 ## License
 
 MIT License - see [LICENSE](LICENSE)
-
-## Attribution
 
 See [NOTICE](NOTICE) for attribution details.
