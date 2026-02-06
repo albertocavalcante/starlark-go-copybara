@@ -2,6 +2,8 @@
 package eval
 
 import (
+	"fmt"
+
 	"go.starlark.net/starlark"
 )
 
@@ -40,6 +42,5 @@ func (e *Evaluator) load(thread *starlark.Thread, module string) (starlark.Strin
 		return m, nil
 	}
 
-	// TODO: Implement file-based module loading
-	return nil, nil
+	return nil, fmt.Errorf("cannot load %s: module not found", module)
 }

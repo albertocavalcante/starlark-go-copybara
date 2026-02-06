@@ -1,0 +1,57 @@
+# Simple copy workflow example using folder origin and destination.
+#
+# This workflow copies files from a local source directory to a destination directory.
+# It's useful for testing transformations locally before applying them to git repositories.
+#
+# Usage:
+#   copybara copy.bara.sky default --folder-origin=/path/to/source --folder-dest=/path/to/dest
+
+core.workflow(
+    name = "default",
+    origin = folder.origin(),
+    destination = folder.destination(),
+    authoring = authoring.pass_thru("Test Author <test@example.com>"),
+    transformations = [
+        # Copy all files as-is
+        core.move("", ""),
+    ],
+)
+
+# Workflow with explicit paths
+core.workflow(
+    name = "with_paths",
+    origin = folder.origin(
+        path = "/tmp/source",
+        materialize_outside_symlinks = True,
+    ),
+    destination = folder.destination(
+        path = "/tmp/destination",
+    ),
+    authoring = authoring.pass_thru("Test Author <test@example.com>"),
+    transformations = [
+        # Move source files to lib directory
+        core.move("src", "lib"),
+        # Replace package names
+        core.replace(
+            before = "package main",
+            after = "package lib",
+        ),
+    ],
+)
+
+# Workflow for testing transformations
+core.workflow(
+    name = "test_transforms",
+    origin = folder.origin(),
+    destination = folder.destination(),
+    authoring = authoring.pass_thru("Test Author <test@example.com>"),
+    transformations = [
+        # Example: Replace old API calls with new ones
+        core.replace(
+            before = "oldApi.call(",
+            after = "newApi.invoke(",
+        ),
+        # Example: Move config files
+        core.move("config/", "settings/"),
+    ],
+)

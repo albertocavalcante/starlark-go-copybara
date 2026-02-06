@@ -2,6 +2,8 @@
 package analysis
 
 import (
+	"fmt"
+
 	"github.com/albertocavalcante/starlark-go-copybara/core"
 )
 
@@ -20,10 +22,10 @@ type TransformInfo struct {
 }
 
 // IntrospectWorkflow returns information about a workflow.
+// NOTE: This is a stub - full implementation pending.
 func IntrospectWorkflow(wf *core.Workflow) *WorkflowInfo {
 	return &WorkflowInfo{
 		Name: wf.Name(),
-		// TODO: Extract origin/destination types
 	}
 }
 
@@ -42,7 +44,7 @@ func NewDryRun(wf *core.Workflow) *DryRun {
 }
 
 // Execute performs the dry run.
+// NOTE: This is a stub - full implementation pending.
 func (d *DryRun) Execute() error {
-	// TODO: Implement dry run simulation
-	return nil
+	return fmt.Errorf("dry run not yet implemented")
 }

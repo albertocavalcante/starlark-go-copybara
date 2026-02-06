@@ -1,17 +1,15 @@
 package core
 
 import (
+	"go.starlark.net/starlark"
+
 	"github.com/albertocavalcante/starlark-go-copybara/transform"
 )
 
 // Transformation is the interface for all code transformations.
+// All transformations must also implement starlark.Value.
+// This embeds transform.Transformation and adds the starlark.Value requirement.
 type Transformation interface {
-	// Apply applies the transformation to the given context.
-	Apply(ctx *transform.Context) error
-
-	// Reverse returns the reverse of this transformation.
-	Reverse() Transformation
-
-	// Describe returns a human-readable description.
-	Describe() string
+	starlark.Value
+	transform.Transformation
 }

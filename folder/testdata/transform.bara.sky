@@ -1,0 +1,37 @@
+# Workflow with transformations for testing.
+#
+# This example shows how to use folder module with transformations.
+
+core.workflow(
+    name = "migrate",
+    origin = folder.origin(
+        path = "testdata/source",
+        materialize_outside_symlinks = True,
+    ),
+    destination = folder.destination(
+        path = "/tmp/output",
+    ),
+    authoring = authoring.pass_thru("Copybara <copybara@example.com>"),
+    transformations = [
+        # Move Go source files to a lib directory
+        core.move("*.go", "lib/"),
+
+        # Update package declaration
+        core.replace(
+            before = "package main",
+            after = "package lib",
+        ),
+
+        # Move config to settings
+        core.move("config/", "settings/"),
+    ],
+)
+
+# A read-only workflow for validation
+core.workflow(
+    name = "validate",
+    origin = folder.origin(),
+    destination = folder.destination(),
+    authoring = authoring.pass_thru("Validator <validator@example.com>"),
+    transformations = [],
+)

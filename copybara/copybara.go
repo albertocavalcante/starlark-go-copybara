@@ -9,12 +9,18 @@ package copybara
 import (
 	"go.starlark.net/starlark"
 
+	"github.com/albertocavalcante/starlark-go-copybara/authoring"
 	"github.com/albertocavalcante/starlark-go-copybara/core"
+	"github.com/albertocavalcante/starlark-go-copybara/folder"
+	"github.com/albertocavalcante/starlark-go-copybara/git"
+	"github.com/albertocavalcante/starlark-go-copybara/metadata"
 )
 
 // Interpreter evaluates Copybara configuration files.
 type Interpreter struct {
 	predeclared starlark.StringDict
+	dryRun      bool
+	workDir     string
 }
 
 // Result contains the evaluated configuration.
@@ -41,8 +47,16 @@ func New(opts ...Option) *Interpreter {
 
 // registerDefaults registers the default Copybara modules.
 func (i *Interpreter) registerDefaults() {
-	// TODO: Register core, git, metadata, authoring, folder modules
 	i.predeclared["core"] = core.Module
+	i.predeclared["git"] = git.Module
+	i.predeclared["metadata"] = metadata.Module
+	i.predeclared["authoring"] = authoring.Module
+	i.predeclared["folder"] = folder.Module
+
+	// Also register globals like glob()
+	for name, val := range core.Globals() {
+		i.predeclared[name] = val
+	}
 }
 
 // Eval evaluates a Copybara configuration file.
@@ -51,14 +65,30 @@ func (i *Interpreter) Eval(filename string, src any) (*Result, error) {
 		Name: "copybara",
 	}
 
-	_, err := starlark.ExecFile(thread, filename, src, i.predeclared)
+	globals, err := starlark.ExecFile(thread, filename, src, i.predeclared)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: Extract workflows from globals
+	// Extract workflows from globals
+	var workflows []*core.Workflow
+	for _, val := range globals {
+		if wf, ok := val.(*core.Workflow); ok {
+			workflows = append(workflows, wf)
+		}
+	}
 
-	return &Result{}, nil
+	return &Result{workflows: workflows}, nil
+}
+
+// DryRun returns whether dry-run mode is enabled.
+func (i *Interpreter) DryRun() bool {
+	return i.dryRun
+}
+
+// WorkDir returns the working directory for file operations.
+func (i *Interpreter) WorkDir() string {
+	return i.workDir
 }
 
 // Workflows returns all workflows defined in the configuration.

@@ -4,8 +4,15 @@ package types
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"go.starlark.net/starlark"
+)
+
+// Ensure Path implements required interfaces.
+var (
+	_ starlark.Value    = (*Path)(nil)
+	_ starlark.HasAttrs = (*Path)(nil)
 )
 
 // Path represents a file path in the working tree.
@@ -59,6 +66,39 @@ func (p *Path) Base() string {
 	return filepath.Base(p.path)
 }
 
+// ResolveSibling returns a new path with the same parent but a different name.
+func (p *Path) ResolveSibling(name string) *Path {
+	parent := filepath.Dir(p.path)
+	return NewPath(filepath.Join(parent, name))
+}
+
+// StartsWith returns true if this path starts with the given prefix.
+func (p *Path) StartsWith(prefix string) bool {
+	cleanPrefix := filepath.Clean(prefix)
+	cleanPath := p.path
+
+	// Handle exact match
+	if cleanPath == cleanPrefix {
+		return true
+	}
+
+	// Ensure we match at path boundaries
+	if !strings.HasSuffix(cleanPrefix, string(filepath.Separator)) {
+		cleanPrefix += string(filepath.Separator)
+	}
+	return strings.HasPrefix(cleanPath+string(filepath.Separator), cleanPrefix)
+}
+
+// Relativize returns a relative path from this path to the given path.
+// Returns an error if the other path is not under this path.
+func (p *Path) Relativize(other *Path) (*Path, error) {
+	rel, err := filepath.Rel(p.path, other.path)
+	if err != nil {
+		return nil, err
+	}
+	return NewPath(rel), nil
+}
+
 // Attr implements starlark.HasAttrs.
 func (p *Path) Attr(name string) (starlark.Value, error) {
 	switch name {
@@ -66,6 +106,16 @@ func (p *Path) Attr(name string) (starlark.Value, error) {
 		return starlark.String(p.path), nil
 	case "name":
 		return starlark.String(p.Base()), nil
+	case "parent":
+		return p.Parent(), nil
+	case "resolve_sibling":
+		return starlark.NewBuiltin("path.resolve_sibling", p.resolveSiblingBuiltin), nil
+	case "starts_with":
+		return starlark.NewBuiltin("path.starts_with", p.startsWithBuiltin), nil
+	case "relativize":
+		return starlark.NewBuiltin("path.relativize", p.relativizeBuiltin), nil
+	case "join":
+		return starlark.NewBuiltin("path.join", p.joinBuiltin), nil
 	default:
 		return nil, nil
 	}
@@ -73,44 +123,49 @@ func (p *Path) Attr(name string) (starlark.Value, error) {
 
 // AttrNames implements starlark.HasAttrs.
 func (p *Path) AttrNames() []string {
-	return []string{"path", "name"}
+	return []string{"join", "name", "parent", "path", "relativize", "resolve_sibling", "starts_with"}
 }
 
-// Glob represents a glob pattern for matching files.
-//
-// Reference: https://github.com/google/copybara/blob/master/java/com/google/copybara/util/Glob.java
-type Glob struct {
-	include []string
-	exclude []string
-}
-
-// NewGlob creates a new Glob from include and exclude patterns.
-func NewGlob(include, exclude []string) *Glob {
-	return &Glob{
-		include: include,
-		exclude: exclude,
+// resolveSiblingBuiltin is the Starlark builtin for resolve_sibling.
+func (p *Path) resolveSiblingBuiltin(_ *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+	var name string
+	if err := starlark.UnpackArgs(fn.Name(), args, kwargs, "name", &name); err != nil {
+		return nil, err
 	}
+	return p.ResolveSibling(name), nil
 }
 
-// String implements starlark.Value.
-func (g *Glob) String() string {
-	return fmt.Sprintf("glob(%v)", g.include)
+// startsWithBuiltin is the Starlark builtin for starts_with.
+func (p *Path) startsWithBuiltin(_ *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+	var prefix string
+	if err := starlark.UnpackArgs(fn.Name(), args, kwargs, "prefix", &prefix); err != nil {
+		return nil, err
+	}
+	return starlark.Bool(p.StartsWith(prefix)), nil
 }
 
-// Type implements starlark.Value.
-func (g *Glob) Type() string {
-	return "glob"
+// relativizeBuiltin is the Starlark builtin for relativize.
+func (p *Path) relativizeBuiltin(_ *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+	var other *Path
+	if err := starlark.UnpackArgs(fn.Name(), args, kwargs, "other", &other); err != nil {
+		return nil, err
+	}
+	result, err := p.Relativize(other)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-// Freeze implements starlark.Value.
-func (g *Glob) Freeze() {}
-
-// Truth implements starlark.Value.
-func (g *Glob) Truth() starlark.Bool {
-	return starlark.Bool(len(g.include) > 0)
-}
-
-// Hash implements starlark.Value.
-func (g *Glob) Hash() (uint32, error) {
-	return 0, fmt.Errorf("unhashable type: glob")
+// joinBuiltin is the Starlark builtin for join.
+func (p *Path) joinBuiltin(_ *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+	segments := make([]string, len(args))
+	for i, arg := range args {
+		s, ok := starlark.AsString(arg)
+		if !ok {
+			return nil, fmt.Errorf("join: expected string, got %s", arg.Type())
+		}
+		segments[i] = s
+	}
+	return p.Join(segments...), nil
 }

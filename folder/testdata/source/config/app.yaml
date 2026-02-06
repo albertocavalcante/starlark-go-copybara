@@ -1,0 +1,15 @@
+name: example-app
+version: "1.0.0"
+description: Example application for testing folder workflows
+
+server:
+  host: localhost
+  port: 8080
+
+database:
+  driver: sqlite
+  path: ./data/app.db
+
+logging:
+  level: info
+  format: json

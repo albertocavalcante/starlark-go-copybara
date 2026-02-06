@@ -1,0 +1,11 @@
+# Simple workflow using folder origin and destination for local testing.
+#
+# This is a minimal example that copies files between local directories.
+
+core.workflow(
+    name = "default",
+    origin = folder.origin(),
+    destination = folder.destination(),
+    authoring = authoring.pass_thru("Local Test <test@local.dev>"),
+    transformations = [],
+)

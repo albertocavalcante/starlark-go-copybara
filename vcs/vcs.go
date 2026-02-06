@@ -1,6 +1,10 @@
 // Package vcs provides version control system abstractions.
 package vcs
 
+import (
+	"github.com/albertocavalcante/starlark-go-copybara/transform"
+)
+
 // Repository represents a version control repository.
 type Repository interface {
 	// URL returns the repository URL.
@@ -13,27 +17,16 @@ type Repository interface {
 	Checkout(ref string) error
 }
 
-// Change represents a version control change (commit).
-type Change struct {
-	// Ref is the change reference (commit hash).
-	Ref string
-
-	// Author is the change author.
-	Author string
-
-	// Message is the commit message.
-	Message string
-
-	// Files is the list of changed files.
-	Files []string
-}
+// Change is an alias to transform.Change for VCS operations.
+// This maintains backward compatibility while consolidating to a single Change type.
+type Change = transform.Change
 
 // Origin is a source repository for migrations.
 type Origin interface {
 	Repository
 
 	// Changes returns changes since the given baseline reference.
-	Changes(baseline string) ([]Change, error)
+	Changes(baseline string) ([]*Change, error)
 }
 
 // Destination is a target repository for migrations.
@@ -41,5 +34,5 @@ type Destination interface {
 	Repository
 
 	// Write writes changes to the destination.
-	Write(changes []Change) error
+	Write(changes []*Change) error
 }
