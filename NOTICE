@@ -1,0 +1,23 @@
+starlark-go-copybara
+Copyright 2026 Alberto Cavalcante
+
+This project implements Copybara's Starlark dialect in Go. It is a clean-room
+implementation that references Copybara's public API and documented behavior,
+but does not copy code from Copybara.
+
+This project uses the following dependencies:
+
+--------------------------------------------------------------------------------
+go.starlark.net - Starlark interpreter in Go
+Copyright 2017 The Bazel Authors
+License: BSD-3-Clause
+https://github.com/google/starlark-go
+--------------------------------------------------------------------------------
+
+The Copybara project, which defines the Starlark dialect this project implements:
+https://github.com/google/copybara
+Copyright 2016 Google LLC
+License: Apache-2.0
+
+While this implementation references Copybara's API design and documented behavior
+for compatibility, no Copybara source code has been copied into this project.
